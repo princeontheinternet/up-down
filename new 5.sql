@@ -1,29 +1,29 @@
-SELECT qls_ts,
-  CASE 
-    WHEN CONVERT_TIMEZONE('America/Los_Angeles', qls_ts)::time = qls_ts::time THEN 'PDT'
-    WHEN CONVERT_TIMEZONE('America/Denver', qls_ts)::time = qls_ts::time THEN 'MDT'
-    WHEN CONVERT_TIMEZONE('America/Chicago', qls_ts)::time = qls_ts::time THEN 'CDT'
-    WHEN CONVERT_TIMEZONE('America/New_York', qls_ts)::time = qls_ts::time THEN 'EDT'
-    WHEN CONVERT_TIMEZONE('America/Phoenix', qls_ts)::time = qls_ts::time THEN 'MST'
-    WHEN CONVERT_TIMEZONE('America/Detroit', qls_ts)::time = qls_ts::time THEN 'EDT'
-    WHEN CONVERT_TIMEZONE('America/Indiana/Indianapolis', qls_ts)::time = qls_ts::time THEN 'EDT'
-    WHEN CONVERT_TIMEZONE('America/Toronto', qls_ts)::time = qls_ts::time THEN 'EDT'
-    WHEN CONVERT_TIMEZONE('America/Vancouver', qls_ts)::time = qls_ts::time THEN 'PDT'
-    WHEN CONVERT_TIMEZONE('America/Regina', qls_ts)::time = qls_ts::time THEN 'CST'
-    WHEN CONVERT_TIMEZONE('America/Winnipeg', qls_ts)::time = qls_ts::time THEN 'CDT'
-    WHEN CONVERT_TIMEZONE('America/Edmonton', qls_ts)::time = qls_ts::time THEN 'MDT'
-    WHEN CONVERT_TIMEZONE('America/Halifax', qls_ts)::time = qls_ts::time THEN 'ADT'
-    WHEN CONVERT_TIMEZONE('America/St_Johns', qls_ts)::time = qls_ts::time THEN 'NDT'
-    WHEN CONVERT_TIMEZONE('America/Yellowknife', qls_ts)::time = qls_ts::time THEN 'MDT'
-    WHEN CONVERT_TIMEZONE('America/Iqaluit', qls_ts)::time = qls_ts::time THEN 'EDT'
-    WHEN CONVERT_TIMEZONE('America/Whitehorse', qls_ts)::time = qls_ts::time THEN 'PDT'
-    WHEN CONVERT_TIMEZONE('America/Rainy_River', qls_ts)::time = qls_ts::time THEN 'CDT'
-    WHEN CONVERT_TIMEZONE('America/Cambridge_Bay', qls_ts)::time = qls_ts::time THEN 'MDT'
-    WHEN CONVERT_TIMEZONE('America/Fort_Nelson', qls_ts)::time = qls_ts::time THEN 'MST'
-    WHEN CONVERT_TIMEZONE('America/Atikokan', qls_ts)::time = qls_ts::time THEN 'EDT'
-    WHEN CONVERT_TIMEZONE('America/Nipigon', qls_ts)::time = qls_ts::time THEN 'EDT'
-    WHEN CONVERT_TIMEZONE('America/Blanc-Sablon', qls_ts)::time = qls_ts::time THEN 'EDT'
-    WHEN CONVERT_TIMEZONE('America/Miquelon', qls_ts)::time = qls_ts::time THEN 'PM'
-    WHEN CONVERT_TIMEZONE('America/Glace_Bay', qls_ts)::time = qls_ts::time THEN 'ADT'
-    WHEN REGEXP_LIKE(qls_ts, '-08[0-9][0-9]') THEN 'PST'
-    WHEN REGEXP_LIKE(qls_ts, '-07[0-9][0-9]') THEN 'MST'
+SELECT
+  qls_id,
+  CONVERT_TIMEZONE('UTC', qls_ts) AS qls_ts_utc,
+  qls_ts,
+  CASE
+    WHEN tzdata.is_dst('America/New_York', EXTRACT(year FROM qls_ts)::int, qls_ts) THEN 
+      CASE
+        WHEN date_part('hour', qls_ts) >= 2 AND date_part('hour', qls_ts) <= 8 THEN 'EDT'
+        ELSE 'EST'
+      END
+    WHEN tzdata.is_dst('America/Chicago', EXTRACT(year FROM qls_ts)::int, qls_ts) THEN 
+      CASE
+        WHEN date_part('hour', qls_ts) >= 2 AND date_part('hour', qls_ts) <= 8 THEN 'CDT'
+        ELSE 'CST'
+      END
+    WHEN tzdata.is_dst('America/Denver', EXTRACT(year FROM qls_ts)::int, qls_ts) THEN 
+      CASE
+        WHEN date_part('hour', qls_ts) >= 2 AND date_part('hour', qls_ts) <= 8 THEN 'MDT'
+        ELSE 'MST'
+      END
+    WHEN tzdata.is_dst('America/Los_Angeles', EXTRACT(year FROM qls_ts)::int, qls_ts) THEN 
+      CASE
+        WHEN date_part('hour', qls_ts) >= 2 AND date_part('hour', qls_ts) <= 8 THEN 'PDT'
+        ELSE 'PST'
+      END
+    ELSE 'Unknown Timezone'
+  END AS qls_timezone
+FROM
+  qls_table;
