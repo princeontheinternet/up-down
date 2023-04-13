@@ -23,5 +23,7 @@ SELECT qls_ts,
     WHEN CONVERT_TIMEZONE('America/Atikokan', qls_ts)::time = qls_ts::time THEN 'EDT'
     WHEN CONVERT_TIMEZONE('America/Nipigon', qls_ts)::time = qls_ts::time THEN 'EDT'
     WHEN CONVERT_TIMEZONE('America/Blanc-Sablon', qls_ts)::time = qls_ts::time THEN 'EDT'
-    WHEN CONVERT_TIMEZONE('America/Miquelon', qls_ts)::time = qls_ts::time THEN 'PMST'
+    WHEN CONVERT_TIMEZONE('America/Miquelon', qls_ts)::time = qls_ts::time THEN 'PM'
     WHEN CONVERT_TIMEZONE('America/Glace_Bay', qls_ts)::time = qls_ts::time THEN 'ADT'
+    WHEN REGEXP_LIKE(qls_ts, '-08[0-9][0-9]') THEN 'PST'
+    WHEN REGEXP_LIKE(qls_ts, '-07[0-9][0-9]') THEN 'MST'
