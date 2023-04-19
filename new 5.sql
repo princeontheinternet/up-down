@@ -1,29 +1,9 @@
-SELECT
-  qls_id,
-  CONVERT_TIMEZONE('UTC', qls_ts) AS qls_ts_utc,
-  qls_ts,
-  CASE
-    WHEN tzdata.is_dst('America/New_York', EXTRACT(year FROM qls_ts)::int, qls_ts) THEN 
-      CASE
-        WHEN date_part('hour', qls_ts) >= 2 AND date_part('hour', qls_ts) <= 8 THEN 'EDT'
-        ELSE 'EST'
-      END
-    WHEN tzdata.is_dst('America/Chicago', EXTRACT(year FROM qls_ts)::int, qls_ts) THEN 
-      CASE
-        WHEN date_part('hour', qls_ts) >= 2 AND date_part('hour', qls_ts) <= 8 THEN 'CDT'
-        ELSE 'CST'
-      END
-    WHEN tzdata.is_dst('America/Denver', EXTRACT(year FROM qls_ts)::int, qls_ts) THEN 
-      CASE
-        WHEN date_part('hour', qls_ts) >= 2 AND date_part('hour', qls_ts) <= 8 THEN 'MDT'
-        ELSE 'MST'
-      END
-    WHEN tzdata.is_dst('America/Los_Angeles', EXTRACT(year FROM qls_ts)::int, qls_ts) THEN 
-      CASE
-        WHEN date_part('hour', qls_ts) >= 2 AND date_part('hour', qls_ts) <= 8 THEN 'PDT'
-        ELSE 'PST'
-      END
-    ELSE 'Unknown Timezone'
-  END AS qls_timezone
-FROM
-  qls_table;
+WHEN CONVERT_TIMEZONE('America/Chicago', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) < 11 THEN 'CST' -- before daylight saving time starts
+    WHEN CONVERT_TIMEZONE('America/Chicago', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) = 11 AND date_part('day', qls_ts) <= 7 AND date_part('dow', qls_ts) = 1 THEN 'CDT' -- first Sunday in November
+    WHEN CONVERT_TIMEZONE('America/Chicago', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) > 3 THEN 'CDT' -- after daylight saving time starts
+    WHEN CONVERT_TIMEZONE('America/Chicago', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) = 3 AND date_part('day', qls_ts) >= 8 AND date_part('dow', qls_ts) = 1 THEN 'CST' -- second Sunday in March
+    
+ WHEN CONVERT_TIMEZONE('America/New_York', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) < 3 THEN 'EST' -- before daylight saving time begins
+    WHEN CONVERT_TIMEZONE('America/New_York', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) > 10 THEN 'EST' -- after daylight saving time ends
+    WHEN CONVERT_TIMEZONE('America/New_York', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) >= 3 AND date_part('month', qls_ts) <= 10 AND extract('dow', qls_ts) = 0 AND extract(hour from qls_ts) = 2 THEN 'EDT' -- start of daylight saving time (second Sunday in March at 2:00 AM)
+    WHEN CONVERT_TIMEZONE('America/New_York', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) >= 3 AND date_part('month', qls_ts) <= 10 AND extract('dow', qls_ts) = 0 AND extract(hour from qls_ts) = 1 THEN 'EDT' -- end of daylight saving time (first Sunday in November at 1:00 AM)
