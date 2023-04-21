@@ -57,10 +57,32 @@ CASE
     
     
     WHEN CONVERT_TIMEZONE('America/Regina', qls_ts)::time = qls_ts::time THEN 'CST'
-    WHEN CONVERT_TIMEZONE('America/Winnipeg', qls_ts)::time = qls_ts::time THEN 'CDT'
-    WHEN CONVERT_TIMEZONE('America/Edmonton', qls_ts)::time = qls_ts::time THEN 'MDT'
-    WHEN CONVERT_TIMEZONE('America/Halifax', qls_ts)::time = qls_ts::time THEN 'ADT'
-    WHEN CONVERT_TIMEZONE('America/St_Johns', qls_ts)::time = qls_ts::time THEN 'NDT'
+
+    
+    WHEN CONVERT_TIMEZONE('America/Winnipeg', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) < 3 THEN 'CST' -- before daylight saving time begins
+    WHEN CONVERT_TIMEZONE('America/Winnipeg', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) > 10 THEN 'CST' -- after daylight saving time ends
+    WHEN CONVERT_TIMEZONE('America/Winnipeg', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) >= 3 AND date_part('month', qls_ts) <= 10 AND extract('dow', qls_ts) = 0 AND extract(hour from qls_ts) = 2 THEN 'CDT' -- start of daylight saving time (second Sunday in March at 2:00 AM)
+    WHEN CONVERT_TIMEZONE('America/Winnipeg', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) >= 3 AND date_part('month', qls_ts) <= 10 AND extract('dow', qls_ts) = 0 AND extract(hour from qls_ts) = 1 THEN 'CDT' -- end of daylight saving time (first Sunday in November at 1:00 AM)
+
+    
+    WHEN CONVERT_TIMEZONE('America/Edmonton', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) < 3 THEN 'MST' -- before daylight saving time begins
+    WHEN CONVERT_TIMEZONE('America/Edmonton', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) > 10 THEN 'MST' -- after daylight saving time ends
+    WHEN CONVERT_TIMEZONE('America/Edmonton', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) >= 3 AND date_part('month', qls_ts) <= 10 AND extract('dow', qls_ts) = 0 AND extract(hour from qls_ts) = 2 THEN 'MDT' -- start of daylight saving time (second Sunday in March at 2:00 AM)
+    WHEN CONVERT_TIMEZONE('America/Edmonton', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) >= 3 AND date_part('month', qls_ts) <= 10 AND extract('dow', qls_ts) = 0 AND extract(hour from qls_ts) = 1 THEN 'MDT' -- end of daylight saving time (first Sunday in November at 1:00 AM)
+
+    
+    WHEN CONVERT_TIMEZONE('America/Halifax', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) < 3 THEN 'AST' -- before daylight saving time begins
+    WHEN CONVERT_TIMEZONE('America/Halifax', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) > 10 THEN 'AST' -- after daylight saving time ends
+    WHEN CONVERT_TIMEZONE('America/Halifax', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) >= 3 AND date_part('month', qls_ts) <= 10 AND extract('dow', qls_ts) = 0 AND extract(hour from qls_ts) = 2 THEN 'ADT' -- start of daylight saving time (second Sunday in March at 2:00 AM)
+    WHEN CONVERT_TIMEZONE('America/Halifax', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) >= 3 AND date_part('month', qls_ts) <= 10 AND extract('dow', qls_ts) = 0 AND extract(hour from qls_ts) = 1 THEN 'ADT' -- end of daylight saving time (first Sunday in November at 1:00 AM)
+
+    
+    WHEN CONVERT_TIMEZONE('America/St_Johns', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) < 3 THEN 'NST' -- before daylight saving time begins
+    WHEN CONVERT_TIMEZONE('America/St_Johns', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) > 10 THEN 'NST' -- after daylight saving time ends
+    WHEN CONVERT_TIMEZONE('America/St_Johns', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) >= 3 AND date_part('month', qls_ts) <= 10 AND extract('dow', qls_ts) = 0 AND extract(hour from qls_ts) = 2 THEN 'NDT' -- start of daylight saving time (second Sunday in March at 2:00 AM)
+    WHEN CONVERT_TIMEZONE('America/St_Johns', qls_ts)::time = qls_ts::time AND date_part('month', qls_ts) >= 3 AND date_part('month', qls_ts) <= 10 AND extract('dow', qls_ts) = 0 AND extract(hour from qls_ts) = 1 THEN 'NDT' -- end of daylight saving time (first Sunday in November at 1:00 AM)
+
+    
     WHEN CONVERT_TIMEZONE('America/Yellowknife', qls_ts)::time = qls_ts::time THEN 'MDT'
     WHEN CONVERT_TIMEZONE('America/Iqaluit', qls_ts)::time = qls_ts::time THEN 'EDT'
     WHEN CONVERT_TIMEZONE('America/Whitehorse', qls_ts)::time = qls_ts::time THEN 'PDT'
