@@ -1,12 +1,1 @@
-Hi Team,
-
-I wanted to bring your attention to an issue regarding the CS_CASE_FACTS table. Specifically, there is a column called QLS_CASE_RELEASED_DATE_TS_TZ in CS_CASE_FACTS that should have the timezone abbreviation from the QLSRELEASEDATETIME column in the client_services_cases table. However, there is an issue because QLSRELEASEDATETIME in Snowflake is utilizing a timestamp date with a timestamp offset. Unfortunately, Snowflake does not have a built-in way to convert this timestamp offset to a timezone abbreviation.
-
-Upon further investigation, I have noticed that the required information for the column QLSRELEASEDATETIME can be found in XML format. In the XML, this column contains the timezone abbreviation. However, when it is loaded into the client_services_cases table, due to the data type (timestamp_tz(9)), the column comes out as a timestamp offset instead of a timezone abbreviation.
-
-One possible solution could be to directly pass this column as text in the source table (client_services_cases) and then extract the timezone abbreviation. Currently, I have not found any similar code that handles this issue - most of the timezone abbreviation columns in the source are populated as is. In our case, this column is being converted into a timestamp offset.
-
-Let's discuss this further to come up with the best approach to address this issue.
-
-Best regards,
-[Your Name]
+Hi
